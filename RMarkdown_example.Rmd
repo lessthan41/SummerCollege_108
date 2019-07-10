@@ -1,0 +1,116 @@
+<h2 id=1></h2>
+###資料科學程式設計　 簡易md檔使用方法
+####地理二　B06208030  何承諭
+
+<h4><a href="https://github.com/lessthan41/SummerCollege_108/blob/master/RMarkdown_example.Rmd">rmd檔連結</a></h4>
+
+**初步環境建置與讀取檔案**
+
+插入程式框在右上角的 **Insert**，選**R**
+```{r results ='hide',message =FALSE,warning=FALSE}
+#在rmd檔裡看上面的大括號內可以設置results/message/warning可以隱藏一些多餘的訊息
+#可以在這個段落跑library和讀檔案
+#library(ggplot2)
+#library(dplyr)
+#library(tm)
+#setwd("D:/SummerCollege/Data") #設置讀取資料的路徑，路徑請盡量不使用中文
+```
+
+> 1.以下有些RMarkDown寫法的教學      
+> 題號可以用">"當前綴來標示    
+
+一般的文字Plain text   
+    
+**換行**最後請空2~4格(兩個tab，讓它辨識你要換行)    
+   
+如果沒空格或br標籤<br>
+在撰寫時換行但結果還是不會換   
+
+斜體：*斜體*　或  _斜體_   
+粗體：**粗體** 或 __粗體__  
+次方的寫法：平方^2^   
+刪除線：~~strikethrough~~   
+連結：[點此進入Peculab.org](http://peculab.org/)   
+
+# 字形1(大)   
+## 字形2   
+### 字形3   
+#### 字形4   
+##### 字形5   
+###### 字形6(小)   
+
+公式： $A = \pi*r^{2}$   
+公式用\$錢字符號括起來，中間用LaTeX格式撰寫       
+
+橫線（分隔線）：
+
+---
+
+> 標示段落1    
+> 標示段落1    
+
+>> 標示段落2    
+>> 標示段落2     
+
+表格：
+ 
+Table Header  | Second Header 
+------------- | ------------- 
+Cell 1        | Cell 2 
+Cell 3        | Cell 4 
+
+一題結束可以用分隔線隔開     
+
+---
+
+> 2.文字與註解
+
+
+```{r}
+#msleep %>% 
+#    select(name, order, sleep_total) %>%
+#    arrange(order, sleep_total) %>% 
+#    filter(sleep_total >= 16)
+```
+
+####文字解釋的部分可以直接撰寫在RMarkDown中   
+    
+####或在程式碼裡使用井號    
+```{r}
+#井號是註解程式碼用的
+```
+
+---
+
+> 3.善用各種Html標籤 "<>"
+
+<blockquote>
+
+例如原本的前綴符號">"可以用 blockquote標籤中間包你要寫的文字或程式碼替代 (可參照助教RMD檔中的寫法)    
+
+這樣對於很多行要一起使用">"比較方便   
+
+
+連結也可以使用 a 標籤替代如 <a href="...">here</a>      
+
+<pre><code>想要文字框可以使用 pre + code 標籤並用</code></pre>
+
+</blockquote>
+
+---
+
+> 最後是 文內連結
+
+寫法長這樣
+
+[Back To Top](#1)
+
+後面的井號代表要傳送到的指定id位置    
+像這篇文的 id=1 位在文章的最上方    
+就是一種方便讀者使用的目錄的概念    
+也可以參照<a href="https://lessthan41.github.io/SummerCollege_108/dplyr_tutorial.html">dplyr教學</a>那篇的目錄形式
+
+
+
+
+
