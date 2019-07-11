@@ -2,7 +2,7 @@
 ###資料科學程式設計　 簡易md檔使用方法
 ####地理二　B06208030  何承諭
 
-<h4><a href="https://github.com/lessthan41/SummerCollege_108/blob/master/RMarkdown_example.Rmd">rmd檔連結</a></h4>
+###請參照<a href="https://github.com/lessthan41/SummerCollege_108/blob/master/RMarkdown_example.Rmd">連結</a>中的Rmd檔進行寫法參考對照
 
 **初步環境建置與讀取檔案**
 

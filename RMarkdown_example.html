@@ -69,9 +69,7 @@ h6 {
 </style>
 
 
-</head>
 
-<body>
 
 <style type="text/css">
 .main-container {
@@ -96,22 +94,92 @@ img {
 button.code-folding-btn:focus {
   outline: none;
 }
+summary {
+  display: list-item;
+}
 </style>
 
 
 
-<div class="container-fluid main-container">
-
 <!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
 <script>
 $(document).ready(function () {
   window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
 });
 </script>
 
 <!-- code folding -->
 
 
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
 
 
 
@@ -130,9 +198,10 @@ $(document).ready(function () {
 <h3>資料科學程式設計　 簡易md檔使用方法</h3>
 <div id="b06208030-" class="section level4">
 <h4>地理二　B06208030 何承諭</h4>
-<h4>
-<a href="https://github.com/lessthan41/SummerCollege_108/blob/master/RMarkdown_example.Rmd">rmd檔連結</a>
-</h4>
+</div>
+</div>
+<div id="rmd" class="section level3">
+<h3>請參照<a href="https://github.com/lessthan41/SummerCollege_108/blob/master/RMarkdown_example.Rmd">連結</a>中的Rmd檔進行寫法參考對照</h3>
 <p><strong>初步環境建置與讀取檔案</strong></p>
 <p>插入程式框在右上角的 <strong>Insert</strong>，選<strong>R</strong></p>
 <pre class="r"><code>#在rmd檔裡看上面的大括號內可以設置results/message/warning可以隱藏一些多餘的訊息
@@ -153,7 +222,6 @@ $(document).ready(function () {
 次方的寫法：平方<sup>2</sup><br />
 刪除線：<del>strikethrough</del><br />
 連結：<a href="http://peculab.org/">點此進入Peculab.org</a></p>
-</div>
 </div>
 <div id="1" class="section level1">
 <h1>字形1(大)</h1>
