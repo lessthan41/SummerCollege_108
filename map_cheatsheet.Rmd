@@ -1,0 +1,128 @@
+---
+title: "地圖繪製"
+author: "B06208030 何承諭"
+date: "2019年7月15日"
+output: html_document
+---
+
+> 以下範例使用台南市學校點資料與全台行政區資料
+
+---
+
+<blockquote>
+環境建置 ── 套件們    
+GISTools (intersect, buffer等相關函數)   
+rgdal (讀shp)    
+sp (投影轉換)    
+
+
+```{r warning=FALSE, message=FALSE}
+
+library(GISTools)
+library(rgdal)
+library(sp)
+
+```
+</blockquote>
+
+---
+
+<blockquote>
+1. 以下讀檔範例 Popn_TWN2.shp, Schools.shp
+
+```{r warning=FALSE, message=FALSE, results='hide'}
+
+setwd("C:/Users/smili/Downloads/Spatial_Analysis")
+
+# 讀取.shp檔 shapefile是由很多個檔案(.cpg .shx等等)所組成的
+# 讀檔範例 Popn_TWN2.shp, Schools.shp
+TW <- readOGR(dsn = ".", layer = "Popn_TWN2", encoding="unicode") # 台灣村里界 (面資料)
+Schools <- readOGR(dsn = ".", layer = "Schools", encoding="unicode") # 台南市學校 (點資料)
+TN <- subset(TW, COUNTY == "臺南市") # 選出臺南市
+
+```
+
+
+讀進來後會是 SpatialPolygonsDataframe (面) 或 SpatialPointsDataframe (點)    
+這兩種資料格式內部大致包含了 投影方式(Projection) 幾何資料(Geometry) 屬性資料框(Dataframe)    
+投影方式在兩個以上的資料堆疊時要一致    
+幾何資料拿來呈現畫圖(行政區外框)    
+屬性資料拿來操作(把你要的資料Merge進他的欄位裡用來面量圖著色)     
+
+
+```{r}
+
+# 屬性資料框 呼叫方式: @data
+data <- TN@data
+head(data)
+
+# 投影方法 呼叫方式: @proj4string
+TN@proj4string
+
+```
+</blockquote>
+
+---
+
+<blockquote>
+2. 確認投影方式是否相同
+
+```{r}
+
+# 確認兩者投影方式是否相同
+Schools@proj4string
+TN@proj4string
+
+# 發現疑似投影不相同的情形(橢球體不同)
+Schools <- spTransform(Schools, TN@proj4string) # 把Schools的投影替換為TN的使一致
+
+```
+</blockquote>
+
+---
+
+<blockquote>
+3. 接下來是基本的疊圖操作 (簡單操作)    
+
+```{r}
+
+par(mar = c(0,0,0,0)) # 設置畫布位置
+plot(TN, col="grey", border="aliceblue")
+plot(Schools, add=T, pch=19, col="blue", cex=0.3)
+
+```
+
+這裡我們可以發現有些點在邊界外，在確認投影方式相同的情形下一般視為誤差    
+因此我會選擇進行:
+
+    1. 邊緣校正 (此步驟視情形使用)
+    2. 忽略位於縣市界線外的學校 (本次我使用)
+
+```{r}
+
+# 1. 邊緣校正
+# 不捨棄點資料，但可能包含到其他行政區的部分點資料
+# 在原本臺南市邊界上做環域擴大原本行政區邊界 單位為投影方式的單位，此處為公尺
+TN.buffer <- gBuffer(TN, width=300) 
+
+par(mar = c(0,0,0,0)) # 設置畫布位置
+plot(TN.buffer, col="grey", border="aliceblue")
+plot(Schools, add=T, pch=19, col="blue", cex=0.3)
+
+```
+
+```{r}
+
+# 2. 忽略界線外的學校 直接取交集
+# 優點就是直覺與直接 乾淨俐落
+# byid 一般取交集都使用TRUE (用在配對兩個資料集之間的id關聯)
+Schools.cor <- gIntersection(TN, Schools, byid = T) 
+
+par(mar = c(0,0,0,0)) # 設置畫布位置
+plot(TN, col="grey", border="aliceblue")
+plot(Schools.cor, add=T, pch=19, col="blue", cex=0.3)
+
+```
+
+</blockquote>
+
