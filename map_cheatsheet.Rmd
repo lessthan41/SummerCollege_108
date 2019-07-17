@@ -1,32 +1,39 @@
 <h2 id = '0'></h2>
 ---
-title: "地圖繪製"
+title: "基本地圖繪製"
 author: "B06208030 何承諭"
 date: "2019年7月15日"
 output: html_document
 ---
 
-> 以下範例使用台南市學校點資料與全台行政區資料[here](https://github.com/lessthan41/SummerCollege_108/tree/master/data)
+> 以下範例使用台南市學校點資料、台北市速食店點位(假資料)與全台行政區資料作圖 [here](https://github.com/lessthan41/SummerCollege_108/tree/master/data)      
+> 還有一些推薦的套件們在這裡可以找到 [here](https://cengel.github.io/rspatial/4_Mapping.nb.html)
 
 ---
 
 
-* [使用套件](#1)
-  
-* [讀shp檔](#2)
+*  [1. 使用套件](#1)
 
-* [確認投影方式](#3)
+*  [2. 讀shp檔](#2)
 
-* [繪製點資料與圖資校正](#4)
+*  [3. 確認投影方式](#3)
 
-* [資料整併](#5)
+*  [4. 繪製點資料(基本疊圖)](#4)
+    +  [圖資校正](#4.1)
 
-* [面量圖上色](#6)
+*  [範例一：面量圖](#5)
+    +  [前置作業─資料整併](#5.1)   
+    +  [面量圖上色](#5.2)
+
+*  [範例二：空間分析函數的應用](#6)
+    +  [前置作業─資料匯入整併](#6.1)   
+    +  [條件篩選](#6.2)   
+    +  [繪製篩選結果](#6.3)
     
     
 <h2 id = '1'></h2>
 <blockquote>
-0. 環境建置 ── 套件們    
+1. 環境建置 ── 套件們    
 GISTools (intersect, buffer, gdistance等相關函數)   
 rgdal (讀shp)    
 sp (投影轉換)    
@@ -37,6 +44,7 @@ sp (投影轉換)
 library(GISTools)
 library(rgdal)
 library(sp)
+library(dplyr) # 這個非必要
 
 ```
 
@@ -48,7 +56,7 @@ library(sp)
 
 <h2 id = '2'></h2>
 <blockquote>
-1. 以下讀檔範例 Popn_TWN2.shp, Schools.shp
+2. 以下讀檔範例 Popn_TWN2.shp, Schools.shp
 
 ```{r warning=FALSE, message=FALSE, results='hide'}
 
@@ -89,7 +97,7 @@ TN@proj4string
 
 <h2 id = '3'></h2>
 <blockquote>
-2. 確認投影方式是否相同
+3. 確認投影方式是否相同
 
 ```{r}
 
@@ -110,7 +118,7 @@ Schools <- spTransform(Schools, TN@proj4string) # 把Schools的投影替換為TN
 
 <h2 id = '4'></h2>
 <blockquote>
-3. 畫出來觀察一下 (疊圖操作)    
+4. 畫出來觀察一下 (疊圖操作)    
 
 ```{r}
 
@@ -119,6 +127,9 @@ plot(TN, col="grey", border="aliceblue")
 plot(Schools, add=T, pch=19, col="blue", cex=0.3)
 
 ```
+<h2 id = '4.1'></h2>
+
+圖資校正    
 
 這裡我們可以發現有些點在邊界外，在確認投影方式相同的情形下一般視為誤差    
 因此我會選擇進行:
@@ -158,11 +169,12 @@ plot(Schools.cor, add=T, pch=19, col="blue", cex=0.3)
 
 ---
 
-<h2 id = '5'></h2>
+<h2 id = '5'>面量圖 Choropleth</h2>
 
+<h2 id = '5.1'></h2>
 <blockquote>
 
-4. 把要畫的資料整併進來     
+把要畫的資料整併進來     
 
 ```{r}
 
@@ -188,10 +200,10 @@ head(df)
 
 ---
 
-<h2 id = '6'></h2>
+<h2 id = '5.2'></h2>
 <blockquote>
 
-5. 面量圖上色
+面量圖上色
 
 ```{r}
 
@@ -208,6 +220,106 @@ choro.legend(208525.1,2555695, shades, title="Density(per km2)") # 圖例
 ```
 
 或者你想要拿算出來的密度去ggplot其他圖表也都可以自行操作    
+
+[back to top](#0)
+
+</blockquote>
+
+---
+
+<h2 id = '6'>空間分析函數的應用</h2>
+
+<h2 id = '6.1'></h2>
+<blockquote>
+前置作業─資料匯入整併   
+
+```{r warning=FALSE, message=FALSE, results='hide'}
+
+# 讀檔
+setwd("C:/Users/smili/Downloads/Spatial_Analysis")
+FF <- readOGR(dsn = ".", layer = "Tpe_Fastfood", encoding="utf8")
+Taipei_Vill <- readOGR(dsn = ".", layer = "Taipei_Vill", encoding="unicode")
+
+```
+
+```{r}
+
+# 確認投影
+FF@proj4string
+Taipei_Vill@proj4string
+
+# 資料處理
+FF_MIC = subset(FF, STORE == "MIC") # 取麥當勞
+
+# 觀察資料
+par(mar = c(2,2,2,2))
+plot(Taipei_Vill, lwd = 0.5, border = "grey50", bg='aliceblue')
+plot(FF_MIC, add=T, pch=19, col="blue", cex=0.6)
+
+```
+
+[back to top](#0)
+
+</blockquote>
+
+---
+
+<blockquote>
+<h2 id = '6.2'></h2>
+條件篩選
+
+找出各村里以中心點圓心，半徑1000m內涵蓋最多麥當勞的村里
+
+```{r}
+
+# 利用村里邊界找出幾何中心點 gCentroid
+centroids <- gCentroid(Taipei_Vill, byid = T, id = rownames(Taipei_Vill))
+
+# 利用村里中心點找出各村里半徑1000m內有多少麥當勞
+df.tmp <- gWithinDistance(FF_MIC, centroids, byid=T, dist=1000) %>% data.frame()
+df.tmp$SUM <- rowSums(df.tmp) # 計算各行總和 (true / false 相當於 1 / 0)
+head(df.tmp)
+
+# 找出總和最大(附近最多麥當勞)的村里是第幾個row 用來當作搜尋村里的index
+index <- c(df.tmp$SUM == max(df.tmp$SUM)) %>% which()
+
+# 要找的那一個村里就可以被搜出來ㄌ 因為她就在行政區圖資的第index行
+toFind_Vill = Taipei_Vill[index,]
+
+# 那圍繞著這個村里的又是哪些麥當勞呢 答案就是在距離 <1000 內的點資料們
+# 這邊一樣可以使用gWithinDistance函數回傳有沒有在1000m內(true/false)
+# 但也可以使用gDistance函數計算距離回傳距離多遠(numeric) 再篩選出距離 <1000m 的row
+index2 <- gDistance(FF_MIC ,gCentroid(toFind_Vill), byid = T) %>% as.vector()
+toFind_MIC <- FF_MIC[index2 <= 1000,]
+
+```
+
+[back to top](#0)
+
+</blockquote>
+
+---
+
+
+<blockquote>
+
+<h2 id = '6.3'></h2>
+
+繪製篩選結果
+
+```{r}
+
+# 接下來就跟之前作法相似 把它畫出來~
+par(mar = c(2,2,2,2))
+plot(Taipei_Vill, lwd = 0.5, border = "grey50", bg='aliceblue')
+plot(toFind_Vill, col="yellow", add=T)
+plot(toFind_MIC, add=T, col="blue", pch=19, cex = 0.6)
+map.scale(289702.6,2764163,4000, "4km", 4, 1) # TWD97, 4000m, 4km
+north.arrow(289702.6,2767730,miles2ft(0.2),col= 'lightblue') 
+title("臺北市被麥當勞服務家數最多之村里")
+text(302796.3, 2771416, labels=toFind_Vill$VILLAGE, pos=2)
+
+```
 
 [back to top](#0)
 
