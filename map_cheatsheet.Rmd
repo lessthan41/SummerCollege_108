@@ -1,3 +1,4 @@
+<h2 id = '0'></h2>
 ---
 title: "地圖繪製"
 author: "B06208030 何承諭"
@@ -5,13 +6,28 @@ date: "2019年7月15日"
 output: html_document
 ---
 
-> 以下範例使用台南市學校點資料與全台行政區資料
+> 以下範例使用台南市學校點資料與全台行政區資料[here](https://github.com/lessthan41/SummerCollege_108/tree/master/data)
 
 ---
 
+
+* [使用套件](#1)
+  
+* [讀shp檔](#2)
+
+* [確認投影方式](#3)
+
+* [繪製點資料與圖資校正](#4)
+
+* [資料整併](#5)
+
+* [面量圖上色](#6)
+    
+    
+<h2 id = '1'></h2>
 <blockquote>
-環境建置 ── 套件們    
-GISTools (intersect, buffer等相關函數)   
+0. 環境建置 ── 套件們    
+GISTools (intersect, buffer, gdistance等相關函數)   
 rgdal (讀shp)    
 sp (投影轉換)    
 
@@ -23,10 +39,14 @@ library(rgdal)
 library(sp)
 
 ```
+
+[back to top](#0)
+
 </blockquote>
 
 ---
 
+<h2 id = '2'></h2>
 <blockquote>
 1. 以下讀檔範例 Popn_TWN2.shp, Schools.shp
 
@@ -60,10 +80,14 @@ head(data)
 TN@proj4string
 
 ```
+
+[back to top](#0)
+
 </blockquote>
 
 ---
 
+<h2 id = '3'></h2>
 <blockquote>
 2. 確認投影方式是否相同
 
@@ -77,12 +101,16 @@ TN@proj4string
 Schools <- spTransform(Schools, TN@proj4string) # 把Schools的投影替換為TN的使一致
 
 ```
+
+[back to top](#0)
+
 </blockquote>
 
 ---
 
+<h2 id = '4'></h2>
 <blockquote>
-3. 接下來是基本的疊圖操作 (簡單操作)    
+3. 畫出來觀察一下 (疊圖操作)    
 
 ```{r}
 
@@ -124,5 +152,63 @@ plot(Schools.cor, add=T, pch=19, col="blue", cex=0.3)
 
 ```
 
+[back to top](#0)
+
 </blockquote>
 
+---
+
+<h2 id = '5'></h2>
+
+<blockquote>
+
+4. 把要畫的資料整併進來     
+
+```{r}
+
+# 叫出屬性資料表
+df <- TN@data
+
+# 新增欄位 AREA(km2) poly.areas()求土地面積
+df$AREA <- poly.areas(TN) / 10^6
+
+# 新增欄位 Schools poly.counts()求Schools在每個行政區內的點數總和
+df$Schools <- poly.counts(Schools, TN)
+
+# 計算學校密度
+df$DENSITY <- df$Schools / df$AREA
+
+head(df)
+
+```
+
+[back to top](#0)
+
+</blockquote>
+
+---
+
+<h2 id = '6'></h2>
+<blockquote>
+
+5. 面量圖上色
+
+```{r}
+
+# plot
+par(mar = c(0,0,3,1)) # 調整下左上右邊界
+shades = auto.shading(df$DENSITY,n=6, cols = brewer.pal(6, "Greens")) # 把顏色自動分為6層
+choropleth(TN, df$DENSITY, shading=shades) # 面量圖
+plot(TN, col=rgb(0,0,0,0), add=T, border="cadetblue1") # 只是設邊框顏色，可忽略
+map.scale(152025.1,2537352,10000, "50 km",2,1) # 前面為比例尺的位置設置 可以使用locator()來定位
+north.arrow(222425,2580695,1500,col= 'lightblue') # 指北針
+title('Schools in Tainan') # 標題
+choro.legend(208525.1,2555695, shades, title="Density(per km2)") # 圖例
+
+```
+
+或者你想要拿算出來的密度去ggplot其他圖表也都可以自行操作    
+
+[back to top](#0)
+
+</blockquote>
