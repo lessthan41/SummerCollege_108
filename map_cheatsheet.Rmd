@@ -14,7 +14,10 @@ output: html_document
 
 *  [1. 使用套件](#1)
 
-*  [2. 讀shp檔](#2)
+*  [2. 讀檔](#2)
+    +  [讀.shp檔](#2.1)
+    +  [讀.csv檔](#2.2)
+    
 
 *  [3. 確認投影方式](#3)
 
@@ -24,6 +27,7 @@ output: html_document
 *  [範例一：面量圖](#5)
     +  [前置作業─資料整併](#5.1)   
     +  [面量圖上色](#5.2)
+    
 
 *  [範例二：空間分析函數的應用](#6)
     +  [前置作業─資料匯入整併](#6.1)   
@@ -56,7 +60,10 @@ library(dplyr) # 這個非必要
 
 <h2 id = '2'></h2>
 <blockquote>
-2. 以下讀檔範例 Popn_TWN2.shp, Schools.shp
+2. 讀檔
+<h2 id = '2.1'></h2>    
+    
+以下讀檔範例 Popn_TWN2.shp, Schools.shp
 
 ```{r warning=FALSE, message=FALSE, results='hide'}
 
@@ -70,8 +77,40 @@ TN <- subset(TW, COUNTY == "臺南市") # 選出臺南市
 
 ```
 
+<h2 id = '2.2'></h2>
+以下讀檔範例 station.csv (經緯度)
 
-讀進來後會是 SpatialPolygonsDataframe (面) 或 SpatialPointsDataframe (點)    
+```{r}
+
+setwd("C:/Users/smili/Downloads/Spatial_Analysis")
+file <- read.csv("station.csv")
+
+head(file)
+
+
+# Case 1: Datum = TWD97, Coor = TM2(m) 如果資料是TM2度XY座標，就直接代入以下公式速解(CRS都幫你設定好了)
+# crs <- CRS("+proj=tmerc +lat_0=0 +lon_0=121 +k=0.9999 +x_0=250000 +y_0=0 +ellps=GRS80 +units=m +no_defs")
+# point = SpatialPointsDataFrame(coords = data.frame(file$X, points$Y), 
+#                                data = points@data,
+#                                proj4string = crs)
+
+# Case 2: Datum = TWD97/WGS84, Coor = Lon/Lat 如果你的座標是經緯度，那也是代公式XD
+crs <- CRS("+init=epsg:4326") # proj4string of coords 經緯度的 epsg(座標代碼)
+point <- SpatialPointsDataFrame(coords = data.frame(file$Lon, file$Lat),
+                                data = file, 
+                                proj4string = crs)
+point <- spTransform(point, TN@proj4string) # 座標轉換
+
+# 測試讀檔是否成功
+par(mar = c(0,0,0,0)) # 設置畫布位置
+plot(TW)
+plot(point, add=T, col = 'blue', cex = 1, pch=19)
+
+```
+
+
+不管哪一種方式    
+讀進來後都會是 SpatialPolygonsDataframe (面) 或 SpatialPointsDataframe (點)    
 這兩種資料格式內部大致包含了 投影方式(Projection) 幾何資料(Geometry) 屬性資料框(Dataframe)    
 投影方式在兩個以上的資料堆疊時要一致    
 幾何資料拿來呈現畫圖(行政區外框)    
