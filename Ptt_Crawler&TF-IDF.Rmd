@@ -1,5 +1,5 @@
 ---
-title: "Ptt Scraper & TF-IDF"
+title: "Ptt Crawler & TF-IDF"
 author: "B06208030 何承諭"
 date: "2019年7月19日"
 output: html_document
@@ -21,6 +21,13 @@ library(knitr)
 > 爬蟲
 
 ```{r}
+
+# 爬簡單需要登入或設定的網站請set cookie
+#links <- GET("https://www.ptt.cc/bbs/sex/index4008.html", set_cookies(`over18` = 1)) %>% 
+#  read_html() %>%
+#  html_nodes('.title a') %>%
+#  html_attrs %>%
+#  as.character
 
 links <- read_html('https://www.ptt.cc/bbs/LoL/index10004.html') %>%
   html_nodes('div.title a') %>%
